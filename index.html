@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>New chat</title>
+    <style>
+        :root {
+            --themecolor: #3376FF;
+            --themecolorlight: #EDF3FF;
+            --themecolormsg: #3A7BFF;
+            --themecolormsgdark: #0049DB;
+        }
+
+        * {
+            font-family: 'Roboto', sans-serif;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-flow: column;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+
+        .nav {
+            flex: 0 1 auto;
+            display: flex;
+            padding: 10px 25px;
+            background: var(--themecolorlight);
+        }
+
+        .nav * {
+            align-self: center;
+        }
+
+        .title {
+            font-size: 15pt;
+            font-weight: bold;
+        }
+
+        .badge {
+            font-size: 12pt;
+            color: var(--themecolor);
+            margin: 0 10px;
+            padding: 2px 7px;
+            border: 1px solid var(--themecolor);
+            border-radius: 5px;
+        }
+
+        .main {
+            flex: 1 1 auto;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 400px;
+            background: var(--themecolorlight);
+            display: flex;
+            flex-flow: column;
+        }
+
+        .history {
+            flex: 1 1 auto;
+            position: relative;
+        }
+
+        .historybuttons {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .buttons {
+            flex: 0 1 auto;
+        }
+
+        .chat {
+            background: var(--themecolormsg);
+            margin: 10px 15px;
+            padding: 10px 25px;
+            cursor: pointer;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .chat.active {
+            background: var(--themecolormsgdark);
+        }
+
+        .msglist {
+            width: 100%;
+            display: flex;
+            flex-flow: column;
+        }
+
+        .messages {
+            flex: 1 1 auto;
+            position: relative;
+            width: 100%;
+        }
+
+        .msginput {
+            flex: 0 1 auto;
+        }
+
+        .messagelist {
+            position: absolute;
+            overflow: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .messagecontainer {
+            margin: 15px;
+        }
+
+        .message {
+            padding: 10px 25px;
+            max-width: 75%;
+            display: inline-block;
+        }
+
+        .messagecontainer.user {
+            text-align: right;
+        }
+
+        .messagecontainer.user .message {
+            border-radius: 25px 0 25px 25px;
+            background: #3A7BFF;
+            color: white;
+        }
+
+        .messagecontainer.bot .message {
+            border-radius: 0 25px 25px 25px;
+            background: #707070;
+            color: white;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .input {
+            background: var(--themecolorlight);
+            margin: 10px 25px;
+            border-radius: 100px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .input input {
+            border: none;
+            background: none;
+            font-size: 12pt;
+            flex-grow: 1;
+            display: inline-block;
+            outline: none;
+            padding: 10px 25px;
+        }
+
+        .input button {
+            background: var(--themecolormsg);
+            fill: white;
+            border: 0;
+            padding: 5px 15px 5px 10px;
+            cursor: pointer;
+        }
+
+        .dot::after {
+            content: '•';
+        }
+
+        .dot {
+            display: inline-block;
+            transform: scale(2);
+            margin: 0 5px;
+        }
+
+        .dot1 {
+            animation: dotscale 1s linear infinite;
+        }
+
+        .dot2 {
+            animation: dotscale 1s linear infinite;
+            animation-delay: 0.33s;
+        }
+
+        .dot3 {
+            animation: dotscale 1s linear infinite;
+            animation-delay: 0.66s;
+        }
+
+        @keyframes dotscale {
+
+            0%,
+            33% {
+                transform: scale(2);
+            }
+
+            16.5% {
+                transform: scale(3);
+            }
+        }
+
+        #bottyping {
+            display: none;
+        }
+    </style>
+    <script src="ripplet.js"></script>
+</head>
+
+<body>
+    <div class="nav">
+        <span class="title">Chatbot</span>
+        <span class="badge" onmousedown="ripplet(event)">Experiment</span>
+    </div>
+    <div class="main">
+        <div class="sidebar">
+            <div class="history">
+                <div class="historybuttons">
+                    <div class="chat active" onmousedown="ripplet(event)">My Chat 1</div>
+                    <div class="chat" onmousedown="ripplet(event)">My Chat 2</div>
+                    <div class="chat" onmousedown="ripplet(event)">My Chat 3</div>
+                </div>
+            </div>
+            <div class="buttons">
+                <div class="chat" onmousedown="ripplet(event)">Upgrade to Plus</div>
+            </div>
+        </div>
+        <div class="msglist">
+            <div class="messages">
+                <div class="messagelist">
+                    <div id="list">
+                        <div class="messagecontainer bot">
+                            <div class="message" onmousedown="ripplet(event)">Hello, how are you doing?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form class="msginput" onsubmit="return sendMsg()">
+                <div class="input">
+                    <input type="text" placeholder="Compose your message here..." autofocus id="message">
+                    <button onmousedown="ripplet(event)">
+                        <svg width="24" height="29" viewBox="0 0 24 29">
+                            <path d="M10.5 27C10.5 27.8284 11.1716 28.5 12 28.5C12.8284 28.5 13.5 27.8284 13.5 27H10.5ZM13.0607 0.93934C12.4749 0.353553 11.5251 0.353553 10.9393 0.93934L1.3934 10.4853C0.807612 11.0711 0.807612 12.0208 1.3934 12.6066C1.97918 13.1924 2.92893 13.1924 3.51472 12.6066L12 4.12132L20.4853 12.6066C21.0711 13.1924 22.0208 13.1924 22.6066 12.6066C23.1924 12.0208 23.1924 11.0711 22.6066 10.4853L13.0607 0.93934ZM13.5 27L13.5 2H10.5L10.5 27H13.5Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+            <script>
+                function sendMsg() {
+                    // https://github.com/fakerybakery/flask_blenderbot_server
+                    var data = new FormData();
+                    var msg = document.getElementById('message').value;
+                    data.append('message', msg);
+                    var container = document.createElement('div');
+                    container.classList.add('messagecontainer');
+                    container.classList.add('user');
+                    var message = document.createElement('div');
+                    message.classList.add('message');
+                    message.textContent = msg;
+                    container.appendChild(message);
+                    message.onmousedown = function(e) {
+                        ripplet(e);
+                    }
+                    document.getElementById('message').value = '';
+                    document.getElementById('list').appendChild(container);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'http://localhost:8080', true);
+                    message.animate([{
+                        opacity: 0
+                    }, {
+                        opacity: 100
+                    }], {
+                        duration: 500
+                    });
+                    var container = document.createElement('div');
+                    container.classList.add('messagecontainer');
+                    container.classList.add('bot');
+                    var message = document.createElement('div');
+                    message.classList.add('message');
+                    message.onmousedown = function(e) {
+                        ripplet(e);
+                    }
+                    container.appendChild(message);
+                    document.getElementById('list').appendChild(container);
+                    message.innerHTML = '<span class="dot dot1"></span><span class="dot dot2"></span><span class="dot dot3"></span>';
+                    message.style.opacity = 0;
+                    setTimeout(function() {
+                        message.animate([{
+                            opacity: 0
+                        }, {
+                            opacity: 100
+                        }], {
+                            duration: 500
+                        });
+                        message.style.opacity = 100;
+                    }, 1000);
+                    xhr.onload = function() {
+                        // do something to response
+                        console.log(this.responseText);
+                        /*
+                        <div class="messagecontainer bot">
+                        <div class="message">Hello, I just got back from walking my dog. How are you?</div>
+                    </div>*/
+                        message.textContent = this.responseText;
+
+                    };
+                    xhr.send(data);
+                    return false;
+                }
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>
